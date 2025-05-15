@@ -254,11 +254,3 @@ body {
 		text-align: center;
 	}
 }
-
-/* Ensure smooth transitions */
-.controls,
-#text-content,
-.speed-controls button,
-.font-size-controls button {
-	/* Removing transitions for better performance */
-}

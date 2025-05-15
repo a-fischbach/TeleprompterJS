@@ -1,6 +1,7 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", () => {
     const fileInput = document.getElementById("file-input");
+    const fileInputLabel = document.getElementById("file-input-label");
     const textContent = document.getElementById("text-content");
     const playPauseButton = document.getElementById("play-pause");
     const speedUpButton = document.getElementById("speed-up");
@@ -12,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const scrollContainer = document.querySelector(".scroll-container");
     const mirrorButton = document.getElementById("mirror");
     if (!fileInput ||
+        !fileInputLabel ||
         !textContent ||
         !playPauseButton ||
         !speedUpButton ||
@@ -186,6 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentY = matrix.m42;
         // Apply transform with mirroring
         textContent.style.transform = isMirrored ? `translateY(${currentY}px) scaleX(-1)` : `translateY(${currentY}px)`;
+        fileInputLabel.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+        mirrorButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+        playPauseButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+        fontSizeDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+        speedDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
     }
     // Handle remote key mappings
     function handleRemoteKey(key, isKeyDown) {

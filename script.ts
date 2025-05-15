@@ -9,6 +9,7 @@ interface FileReaderEvent extends Event {
 
 document.addEventListener("DOMContentLoaded", () => {
 	const fileInput = document.getElementById("file-input") as HTMLInputElement;
+	const fileInputLabel = document.getElementById("file-input-label") as HTMLInputElement;
 	const textContent = document.getElementById("text-content") as HTMLElement;
 	const playPauseButton = document.getElementById("play-pause") as HTMLButtonElement;
 	const speedUpButton = document.getElementById("speed-up") as HTMLButtonElement;
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	if (
 		!fileInput ||
+		!fileInputLabel ||
 		!textContent ||
 		!playPauseButton ||
 		!speedUpButton ||
@@ -191,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Move content with mirroring if enabled
 		textContent.style.transform = isMirrored
-			? `translateY(${currentY + amount}px) scaleX(-1) scaleY(-1)`
+			? `translateY(${currentY + amount}px) scaleX(-1)`
 			: `translateY(${currentY + amount}px)`;
 		return true;
 	}
@@ -229,34 +231,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		const matrix = new DOMMatrix(currentTransform);
 		const currentY = matrix.m42;
 
-		// Apply transform with mirroring to text content
-		textContent.style.transform = isMirrored
-			? `translateY(${currentY}px) scaleX(-1) scaleY(-1)`
-			: `translateY(${currentY}px)`;
-
-		// Mirror all UI elements
-		const uiElements = [
-			playPauseButton,
-			speedUpButton,
-			speedDownButton,
-			fontSizeUpButton,
-			fontSizeDownButton,
-			mirrorButton,
-			fileInput,
-			document.querySelector(".file-label"),
-			document.querySelector(".speed-controls"),
-			document.querySelector(".font-size-controls"),
-			document.querySelector(".left-controls"),
-			document.querySelector(".right-controls"),
-			document.querySelector(".controls"),
-			document.querySelector(".keyboard-instructions"),
-		];
-
-		uiElements.forEach((element) => {
-			if (element) {
-				(element as HTMLElement).style.transform = isMirrored ? "scaleX(-1) scaleY(-1)" : "";
-			}
-		});
+		// Apply transform with mirroring
+		textContent.style.transform = isMirrored ? `translateY(${currentY}px) scaleX(-1)` : `translateY(${currentY}px)`;
+		fileInputLabel.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+		mirrorButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+		playPauseButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+		fontSizeDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+		speedDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
 	}
 
 	// Handle remote key mappings
