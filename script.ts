@@ -1,45 +1,76 @@
+// Type definitions
+interface HTMLInputEvent extends Event {
+	target: HTMLInputElement;
+}
+
+interface FileReaderEvent extends Event {
+	target: FileReader;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-	const fileInput = document.getElementById("file-input");
-	const textContent = document.getElementById("text-content");
-	const playPauseButton = document.getElementById("play-pause");
-	const speedUpButton = document.getElementById("speed-up");
-	const speedDownButton = document.getElementById("speed-down");
-	const speedDisplay = document.getElementById("speed-display");
+	const fileInput = document.getElementById("file-input") as HTMLInputElement;
+	const textContent = document.getElementById("text-content") as HTMLElement;
+	const playPauseButton = document.getElementById("play-pause") as HTMLButtonElement;
+	const speedUpButton = document.getElementById("speed-up") as HTMLButtonElement;
+	const speedDownButton = document.getElementById("speed-down") as HTMLButtonElement;
+	const speedDisplay = document.getElementById("speed-display") as HTMLElement;
+	const scrollContainer = document.querySelector(".scroll-container") as HTMLElement;
+
+	if (
+		!fileInput ||
+		!textContent ||
+		!playPauseButton ||
+		!speedUpButton ||
+		!speedDownButton ||
+		!speedDisplay ||
+		!scrollContainer
+	) {
+		console.error("Required DOM elements not found");
+		return;
+	}
 
 	let scrollSpeed = 1.0;
 	let isPlaying = false;
-	let scrollInterval;
-	let manualScrollInterval;
-	let keysPressed = {};
+	let scrollInterval: number | undefined;
+	let manualScrollInterval: number | undefined;
+	let keysPressed: { [key: string]: boolean } = {};
 
+	interface KeyBindings {
+		[key: string]: {
+			down: string;
+			up: string;
+		};
+	}
 	// Remote key mappings
-	const remoteKeys = {
+	const remoteKeys: KeyBindings = {
 		// Physical key = [keyDown, keyUp]
-		x: ["y", "t"],
-		y: ["u", "f"],
-		a: ["h", "r"],
-		b: ["j", "n"],
-		o: ["o", "g"], // Mirror
-		a: ["a", "q"], // Down
-		d: ["d", "c"], // Up
-		w: ["w", "e"], // Left
-		x: ["x", "z"], // Right
+		x: { down: "y", up: "t" },
+		y: { down: "u", up: "f" },
+		a: { down: "h", up: "r" },
+		b: { down: "j", up: "n" },
+		mirror: { down: "o", up: "g" }, // Mirror
+		arrowLeft: { down: "a", up: "q" }, // Down
+		arrowRight: { down: "d", up: "c" }, // Up
+		arrowUp: { down: "w", up: "e" }, // Left
+		arrowDown: { down: "x", up: "z" }, // Right
 	};
 
 	// File handling
-	fileInput.addEventListener("change", (event) => {
-		const file = event.target.files[0];
+	fileInput.addEventListener("change", (event: Event) => {
+		const inputEvent = event as HTMLInputEvent;
+		const file = inputEvent.target.files?.[0];
 		if (!file) return;
 
 		const reader = new FileReader();
-		reader.onload = (e) => {
-			const content = e.target.result;
+		reader.onload = (e: Event) => {
+			const fileEvent = e as FileReaderEvent;
+			const content = fileEvent.target.result as string;
 			displayContent(content);
 		};
 		reader.readAsText(file);
 	});
 
-	function displayContent(content) {
+	function displayContent(content: string) {
 		// Process the content - replace new lines with <p> tags
 		const formattedContent = content
 			.split("\n\n") // Split on empty lines
@@ -97,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		adjustSpeed(-0.1);
 	});
 
-	function adjustSpeed(delta) {
+	function adjustSpeed(delta: number) {
 		scrollSpeed = Math.max(0.1, Math.min(5.0, scrollSpeed + delta));
 		scrollSpeed = parseFloat(scrollSpeed.toFixed(1)); // Round to 1 decimal place
 		speedDisplay.textContent = `${scrollSpeed.toFixed(1)}x`;
@@ -113,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	// Scroll text function - reused by both auto and manual scrolling
-	function scrollText(amount) {
+	function scrollText(amount: number): boolean {
 		// Get current transform
 		const currentTransform = window.getComputedStyle(textContent).transform;
 		const matrix = new DOMMatrix(currentTransform);
@@ -121,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Calculate total height of content and container
 		const totalHeight = textContent.offsetHeight;
-		const containerHeight = document.querySelector(".scroll-container").offsetHeight;
+		const containerHeight = scrollContainer.offsetHeight;
 
 		// Check boundaries
 		if (amount < 0 && Math.abs(currentY - Math.abs(amount)) >= totalHeight - containerHeight) {
@@ -140,14 +171,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Manual scroll functions with key hold support
 	function startManualScroll() {
 		clearInterval(manualScrollInterval);
-
+		console.log("keysPressed", keysPressed);
 		manualScrollInterval = setInterval(() => {
 			// Check for remote keys that should scroll down
-			if (keysPressed["x"] || keysPressed["a"]) {
+			if (keysPressed["arrowRight"]) {
 				scrollText(-scrollSpeed);
 			}
 			// Check for remote keys that should scroll up
-			else if (keysPressed["b"] || keysPressed["d"]) {
+			else if (keysPressed["arrowLeft"]) {
 				scrollText(scrollSpeed);
 			}
 		}, 16); // ~60fps
@@ -155,33 +186,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function stopManualScroll() {
 		clearInterval(manualScrollInterval);
-		manualScrollInterval = null;
+		manualScrollInterval = undefined;
 	}
 
 	// Handle remote key mappings
-	function handleRemoteKey(key, isKeyDown) {
+	function handleRemoteKey(key: string, isKeyDown: boolean): void {
 		// Find which physical key this belongs to
-		for (const [physicalKey, [downKey, upKey]] of Object.entries(remoteKeys)) {
-			if (isKeyDown && key === downKey) {
-				// This is a key down event for a remote key
-				keysPressed[physicalKey] = true;
-				handleKeyAction(physicalKey, true);
-				return true;
-			} else if (!isKeyDown && key === upKey) {
-				// This is a key up event for a remote key
-				delete keysPressed[physicalKey];
+		for (const [physicalKey, binding] of Object.entries(remoteKeys)) {
+			if (binding.down === key) {
+				keysPressed[physicalKey] = isKeyDown;
+				handleKeyAction(physicalKey, isKeyDown);
+				return;
+			}
+			if (binding.up === key) {
+				keysPressed[physicalKey] = false;
 				handleKeyAction(physicalKey, false);
-				return true;
+				return;
 			}
 		}
-		return false;
 	}
 
 	// Handle actions based on physical keys
-	function handleKeyAction(physicalKey, isKeyDown) {
+	function handleKeyAction(physicalKey: string, isKeyDown: boolean) {
 		if (!isKeyDown) {
 			// Check if any scroll keys are still pressed
-			const scrollKeysPressed = ["x", "a", "b", "d"].some((key) => keysPressed[key]);
+			const scrollKeysPressed = ["arrowRight", "arrowLeft"].some((key) => keysPressed[key]);
 
 			// If no scroll keys are pressed, stop manual scrolling
 			if (!scrollKeysPressed) {
@@ -193,36 +222,47 @@ document.addEventListener("DOMContentLoaded", () => {
 		// Handle key down actions
 		switch (physicalKey) {
 			case "x": // Y button (scroll down)
-			case "a": // Down button (scroll down)
-				if (!manualScrollInterval) {
-					startManualScroll();
-				}
-				break;
-			case "b": // J button (scroll up)
-			case "d": // Up button (scroll up)
-				if (!manualScrollInterval) {
-					startManualScroll();
-				}
-				break;
-			case "y": // U button (increase speed)
 				adjustSpeed(0.1);
 				break;
-			case "a": // H button (decrease speed)
+			case "y": // U button (scroll down)
+				//increase font size
+				break;
+			case "a": // H button (scroll up)
+				//decrease font size
+				break;
+			case "b": // J button (scroll up)
 				adjustSpeed(-0.1);
 				break;
-			case "o": // Mirror button (play/pause)
+			case "arrowLeft": // W button (scroll left)
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
+				break;
+			case "arrowRight": // X button (scroll right)
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
+				break;
+			case "arrowDown": // A button (increase speed)
 				togglePlayPause();
+				break;
+			case "arrowUp": // D button (decrease speed)
+				togglePlayPause();
+				break;
+			case "mirror": // O button (play/pause)
+				//mirror the text
 				break;
 		}
 	}
 
 	// Keyboard controls
-	document.addEventListener("keydown", (event) => {
+	document.addEventListener("keydown", (event: KeyboardEvent) => {
 		// Handle key presses only if text content is loaded
 		if (textContent.innerHTML.trim() === "") return;
 
 		// Try to handle as a remote key
-		if (handleRemoteKey(event.key, true)) {
+		handleRemoteKey(event.key, true);
+		if (Object.values(remoteKeys).some((binding) => binding.down === event.key || binding.up === event.key)) {
 			event.preventDefault();
 			return;
 		}
@@ -233,23 +273,20 @@ document.addEventListener("DOMContentLoaded", () => {
 				event.preventDefault();
 				togglePlayPause();
 				break;
-			case "ArrowUp":
-				event.preventDefault();
-				adjustSpeed(0.1);
-				break;
-			case "ArrowDown":
-				event.preventDefault();
-				adjustSpeed(-0.1);
-				break;
 		}
 	});
 
-	document.addEventListener("keyup", (event) => {
+	document.addEventListener("keyup", (event: KeyboardEvent) => {
 		// Try to handle as a remote key
-		if (handleRemoteKey(event.key, false)) {
+		handleRemoteKey(event.key, false);
+		if (Object.values(remoteKeys).some((binding) => binding.down === event.key || binding.up === event.key)) {
 			event.preventDefault();
 			return;
 		}
+	});
+
+	scrollContainer.addEventListener("click", (event: Event) => {
+		console.log("scroll", event);
 	});
 
 	// Initialize with controls disabled until file is loaded

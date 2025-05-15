@@ -1,0 +1,25 @@
+{
+	"name": "teleprompterjs",
+	"version": "1.0.0",
+	"description": "A simple teleprompter application built with vanilla JavaScript, HTML, and CSS. Designed to work well on older iPads and support Bluetooth keyboard controls.",
+	"main": "index.js",
+	"scripts": {
+		"build": "tsc",
+		"watch": "tsc -w",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/a-fischbach/TeleprompterJS.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/a-fischbach/TeleprompterJS/issues"
+	},
+	"homepage": "https://github.com/a-fischbach/TeleprompterJS#readme",
+	"devDependencies": {
+		"typescript": "^5.8.3"
+	}
+}
