@@ -186,8 +186,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentTransform = window.getComputedStyle(textContent).transform;
         const matrix = new DOMMatrix(currentTransform);
         const currentY = matrix.m42;
-        // Apply transform with mirroring
-        textContent.style.transform = isMirrored ? `translateY(${currentY}px) scaleX(-1)` : `translateY(${currentY}px)`;
+        // Apply transform with mirroring and rotation
+        textContent.style.transform = isMirrored
+            ? `translateY(${currentY}px) scaleX(-1) rotate(180deg)`
+            : `translateY(${currentY}px)`;
         fileInputLabel.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
         mirrorButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
         playPauseButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
