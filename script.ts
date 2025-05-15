@@ -182,19 +182,22 @@ document.addEventListener("DOMContentLoaded", () => {
 		const totalHeight = textContent.offsetHeight;
 		const containerHeight = scrollContainer.offsetHeight;
 
+		// For mirrored text, we need to invert the scroll direction
+		const adjustedAmount = isMirrored ? -amount : amount;
+
 		// Check boundaries
-		if (amount < 0 && Math.abs(currentY - Math.abs(amount)) >= totalHeight - containerHeight) {
+		if (adjustedAmount < 0 && Math.abs(currentY - Math.abs(adjustedAmount)) >= totalHeight - containerHeight) {
 			// Don't scroll past the bottom
 			return false;
-		} else if (amount > 0 && currentY + amount > 0) {
+		} else if (adjustedAmount > 0 && currentY + adjustedAmount > 0) {
 			// Don't scroll past the top
 			return false;
 		}
 
-		// Move content with mirroring if enabled
+		// Move content with mirroring and rotation if enabled
 		textContent.style.transform = isMirrored
-			? `translateY(${currentY + amount}px) scaleX(-1)`
-			: `translateY(${currentY + amount}px)`;
+			? `translateY(${currentY + adjustedAmount}px) scaleX(-1) rotate(180deg)`
+			: `translateY(${currentY + adjustedAmount}px)`;
 		return true;
 	}
 
@@ -226,20 +229,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		isMirrored = !isMirrored;
 		mirrorButton.textContent = isMirrored ? "Unmirror" : "Mirror";
 
-		// Get current Y position
-		const currentTransform = window.getComputedStyle(textContent).transform;
-		const matrix = new DOMMatrix(currentTransform);
-		const currentY = matrix.m42;
+		// Calculate total height of content and container
+		const totalHeight = textContent.offsetHeight;
+		const containerHeight = scrollContainer.offsetHeight;
+		const maxScroll = totalHeight - containerHeight;
 
-		// Apply transform with mirroring and rotation
+		// Set initial position - start at bottom when mirrored
 		textContent.style.transform = isMirrored
-			? `translateY(${currentY}px) scaleX(-1) rotate(180deg)`
-			: `translateY(${currentY}px)`;
-		fileInputLabel.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
-		mirrorButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
-		playPauseButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
-		fontSizeDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
-		speedDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1)`;
+			? `translateY(${-maxScroll}px) scaleX(-1) rotate(180deg)`
+			: `translateY(0)`;
+
+		fileInputLabel.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
+		mirrorButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
+		playPauseButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
+		fontSizeDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
+		speedDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
 	}
 
 	// Handle remote key mappings
