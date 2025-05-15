@@ -20,6 +20,7 @@ body {
 	height: 100vh;
 	padding: 0;
 	margin: 0;
+	position: relative;
 }
 
 .controls {
@@ -30,7 +31,11 @@ body {
 	background-color: #333;
 	border-radius: 0;
 	margin: 0;
-	position: relative;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
 }
 
 .left-controls,
@@ -131,6 +136,7 @@ body {
 	border-radius: 0;
 	overflow: hidden;
 	margin: 0;
+	margin-bottom: 60px;
 }
 
 .scroll-container {
