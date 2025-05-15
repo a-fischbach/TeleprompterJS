@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let manualScrollInterval;
     let keysPressed = {};
     let fontSize = 24; // Default font size in pixels
-    const centerOffset = scrollContainer.offsetHeight / 2;
     // Remote key mappings
     const remoteKeys = {
         // Physical key = [keyDown, keyUp]
@@ -63,6 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         reader.readAsText(file);
     });
+    function calculateCenterOffset() {
+        // Calculate total height of content and container
+        const totalHeight = textContent.offsetHeight;
+        const containerHeight = scrollContainer.offsetHeight;
+        const maxScroll = totalHeight - containerHeight;
+        const centerOffset = containerHeight / 2;
+        return { maxScroll, centerOffset };
+    }
     function displayContent(content) {
         // Process the content - replace new lines with <p> tags
         const formattedContent = content
@@ -72,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .map((paragraph) => `<p>${paragraph}</p>`)
             .join("");
         textContent.innerHTML = formattedContent;
+        const { maxScroll, centerOffset } = calculateCenterOffset();
         // Set initial position to center (red line) by offsetting by half the container height
         textContent.style.transform = `translateY(${centerOffset}px)`;
         // Enable controls
@@ -134,6 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
         fontSize = Math.max(12, Math.min(72, fontSize + delta)); // Limit font size between 12px and 72px
         textContent.style.fontSize = `${fontSize}px`;
         fontSizeDisplay.textContent = `${fontSize}px`;
+        // Recalculate center offset after font size change
+        const { maxScroll, centerOffset } = calculateCenterOffset();
+        // Apply the new center offset while preserving any existing mirroring
+        textContent.style.transform = isMirrored
+            ? `translateY(${-maxScroll - centerOffset}px) scaleX(-1) rotate(180deg)`
+            : `translateY(${centerOffset}px)`;
     }
     // Scroll text function - reused by both auto and manual scrolling
     function scrollText(amount) {
@@ -185,10 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function toggleMirror() {
         isMirrored = !isMirrored;
         mirrorButton.textContent = isMirrored ? "Unmirror" : "Mirror";
-        // Calculate total height of content and container
-        const totalHeight = textContent.offsetHeight;
-        const containerHeight = scrollContainer.offsetHeight;
-        const maxScroll = totalHeight - containerHeight;
+        const { maxScroll, centerOffset } = calculateCenterOffset();
         // Set initial position - start at center (red line) in both modes
         textContent.style.transform = isMirrored
             ? `translateY(${-maxScroll - centerOffset}px) scaleX(-1) rotate(180deg)`
