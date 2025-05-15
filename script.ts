@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let manualScrollInterval: number | undefined;
 	let keysPressed: { [key: string]: boolean } = {};
 	let fontSize = 24; // Default font size in pixels
+	const centerOffset = scrollContainer.offsetHeight / 2;
 
 	interface KeyBindings {
 		[key: string]: {
@@ -93,13 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		textContent.innerHTML = formattedContent;
 
-		// Calculate total height of content and container
-		const totalHeight = textContent.offsetHeight;
-		const containerHeight = scrollContainer.offsetHeight;
-		const maxScroll = totalHeight - containerHeight;
-
 		// Set initial position to center (red line) by offsetting by half the container height
-		const centerOffset = containerHeight / 2;
 		textContent.style.transform = `translateY(${centerOffset}px)`;
 
 		// Enable controls
@@ -241,9 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		const maxScroll = totalHeight - containerHeight;
 
 		// Set initial position - start at center (red line) in both modes
-		const centerOffset = containerHeight / 2;
 		textContent.style.transform = isMirrored
-			? `translateY(${centerOffset}px) scaleX(-1) rotate(180deg)`
+			? `translateY(${-maxScroll - centerOffset}px) scaleX(-1) rotate(180deg)`
 			: `translateY(${centerOffset}px)`;
 
 		fileInputLabel.style.transform = isMirrored ? `scaleX(-1) rotate(180deg)` : `scaleX(1)`;
