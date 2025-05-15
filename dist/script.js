@@ -55,6 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function saveFontSize(size) {
         localStorage.setItem(STORAGE_KEYS.FONT_SIZE, size.toString());
     }
+    // Apply loaded preferences to UI
+    speedDisplay.textContent = `${scrollSpeed.toFixed(1)}x`;
+    textContent.style.fontSize = `${fontSize}px`;
+    fontSizeDisplay.textContent = `${fontSize}px`;
     // Remote key mappings
     const remoteKeys = {
         // Physical key = [keyDown, keyUp]
