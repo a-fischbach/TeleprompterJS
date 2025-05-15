@@ -143,11 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		manualScrollInterval = setInterval(() => {
 			// Check for remote keys that should scroll down
-			if (keysPressed["y"] || keysPressed["u"] || keysPressed["a"]) {
+			if (keysPressed["x"] || keysPressed["a"]) {
 				scrollText(-scrollSpeed);
 			}
 			// Check for remote keys that should scroll up
-			else if (keysPressed["j"] || keysPressed["d"]) {
+			else if (keysPressed["b"] || keysPressed["d"]) {
 				scrollText(scrollSpeed);
 			}
 		}, 16); // ~60fps
@@ -180,8 +180,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Handle actions based on physical keys
 	function handleKeyAction(physicalKey, isKeyDown) {
 		if (!isKeyDown) {
-			// Only check if we should stop manual scrolling when a key is released
-			if (!Object.values(remoteKeys).some(([downKey, upKey]) => keysPressed[downKey] || keysPressed[upKey])) {
+			// Check if any scroll keys are still pressed
+			const scrollKeysPressed = ["x", "a", "b", "d"].some((key) => keysPressed[key]);
+
+			// If no scroll keys are pressed, stop manual scrolling
+			if (!scrollKeysPressed) {
 				stopManualScroll();
 			}
 			return;
