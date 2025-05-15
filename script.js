@@ -12,6 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	let manualScrollInterval;
 	let keysPressed = {};
 
+	// Remote key mappings
+	const remoteKeys = {
+		// Physical key = [keyDown, keyUp]
+		x: ["y", "t"],
+		y: ["u", "f"],
+		a: ["h", "r"],
+		b: ["j", "n"],
+		o: ["o", "g"], // Mirror
+		a: ["a", "q"], // Down
+		d: ["d", "c"], // Up
+		w: ["w", "e"], // Left
+		x: ["x", "z"], // Right
+	};
+
 	// File handling
 	fileInput.addEventListener("change", (event) => {
 		const file = event.target.files[0];
@@ -128,9 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		clearInterval(manualScrollInterval);
 
 		manualScrollInterval = setInterval(() => {
-			if (keysPressed["y"] || keysPressed["Y"]) {
+			// Check for remote keys that should scroll down
+			if (keysPressed["y"] || keysPressed["u"] || keysPressed["a"]) {
 				scrollText(-scrollSpeed);
-			} else if (keysPressed["j"] || keysPressed["J"]) {
+			}
+			// Check for remote keys that should scroll up
+			else if (keysPressed["j"] || keysPressed["d"]) {
 				scrollText(scrollSpeed);
 			}
 		}, 16); // ~60fps
@@ -141,14 +158,73 @@ document.addEventListener("DOMContentLoaded", () => {
 		manualScrollInterval = null;
 	}
 
+	// Handle remote key mappings
+	function handleRemoteKey(key, isKeyDown) {
+		// Find which physical key this belongs to
+		for (const [physicalKey, [downKey, upKey]] of Object.entries(remoteKeys)) {
+			if (isKeyDown && key === downKey) {
+				// This is a key down event for a remote key
+				keysPressed[physicalKey] = true;
+				handleKeyAction(physicalKey, true);
+				return true;
+			} else if (!isKeyDown && key === upKey) {
+				// This is a key up event for a remote key
+				delete keysPressed[physicalKey];
+				handleKeyAction(physicalKey, false);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// Handle actions based on physical keys
+	function handleKeyAction(physicalKey, isKeyDown) {
+		if (!isKeyDown) {
+			// Only check if we should stop manual scrolling when a key is released
+			if (!Object.values(remoteKeys).some(([downKey, upKey]) => keysPressed[downKey] || keysPressed[upKey])) {
+				stopManualScroll();
+			}
+			return;
+		}
+
+		// Handle key down actions
+		switch (physicalKey) {
+			case "x": // Y button (scroll down)
+			case "a": // Down button (scroll down)
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
+				break;
+			case "b": // J button (scroll up)
+			case "d": // Up button (scroll up)
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
+				break;
+			case "y": // U button (increase speed)
+				adjustSpeed(0.1);
+				break;
+			case "a": // H button (decrease speed)
+				adjustSpeed(-0.1);
+				break;
+			case "o": // Mirror button (play/pause)
+				togglePlayPause();
+				break;
+		}
+	}
+
 	// Keyboard controls
 	document.addEventListener("keydown", (event) => {
 		// Handle key presses only if text content is loaded
 		if (textContent.innerHTML.trim() === "") return;
 
-		// Track pressed keys
-		keysPressed[event.key] = true;
+		// Try to handle as a remote key
+		if (handleRemoteKey(event.key, true)) {
+			event.preventDefault();
+			return;
+		}
 
+		// Fall back to regular keyboard controls
 		switch (event.key) {
 			case " ": // Space bar
 				event.preventDefault();
@@ -162,41 +238,14 @@ document.addEventListener("DOMContentLoaded", () => {
 				event.preventDefault();
 				adjustSpeed(-0.1);
 				break;
-			case "y":
-			case "Y":
-				event.preventDefault();
-				if (!manualScrollInterval) {
-					startManualScroll();
-				}
-				break;
-			case "j":
-			case "J":
-				event.preventDefault();
-				if (!manualScrollInterval) {
-					startManualScroll();
-				}
-				break;
-			case "q":
-			case "Q":
-				event.preventDefault();
-				togglePlayPause();
-				break;
 		}
 	});
 
 	document.addEventListener("keyup", (event) => {
-		// Remove key from pressed keys
-		delete keysPressed[event.key];
-
-		// If both Y and J are released, stop manual scrolling
-		if (
-			(event.key === "y" || event.key === "Y" || event.key === "j" || event.key === "J") &&
-			!keysPressed["y"] &&
-			!keysPressed["Y"] &&
-			!keysPressed["j"] &&
-			!keysPressed["J"]
-		) {
-			stopManualScroll();
+		// Try to handle as a remote key
+		if (handleRemoteKey(event.key, false)) {
+			event.preventDefault();
+			return;
 		}
 	});
 

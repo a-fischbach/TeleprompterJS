@@ -7,12 +7,19 @@ A simple teleprompter application built with vanilla JavaScript, HTML, and CSS. 
 -   Load and display text files (.txt)
 -   Adjustable scroll speed
 -   Play/pause functionality
--   Support for keyboard controls:
-    -   Space or Q: Play/Pause
-    -   Up Arrow: Increase Speed
-    -   Down Arrow: Decrease Speed
-    -   Y: Hold to Scroll Down (at current speed)
-    -   J: Hold to Scroll Up (at current speed)
+-   Support for remote control and keyboard controls:
+    -   Remote Control:
+        -   X Button (Y/T): Scroll Down
+        -   B Button (J/N): Scroll Up
+        -   Y Button (U/F): Increase Speed
+        -   A Button (H/R): Decrease Speed
+        -   Mirror Button (O/G): Play/Pause
+        -   Down Button (A/Q): Scroll Down
+        -   Up Button (D/C): Scroll Up
+    -   Keyboard Controls:
+        -   Space: Play/Pause
+        -   Up Arrow: Increase Speed
+        -   Down Arrow: Decrease Speed
 -   Mobile-optimized for iPad usage
 -   Visual marker for current reading position
 
@@ -22,13 +29,13 @@ A simple teleprompter application built with vanilla JavaScript, HTML, and CSS. 
 2. Click "Open Text File" to load a .txt document
 3. Press "Play" to begin scrolling text
 4. Adjust scroll speed with "+" and "-" buttons
-5. Use keyboard controls for hands-free operation
+5. Use remote control or keyboard controls for hands-free operation
 
 ## iPad Setup
 
 1. Transfer the files to your iPad using a file transfer app or by hosting them on a local web server
 2. Open the `index.html` file in Safari
-3. Connect your Bluetooth keyboard
+3. Connect your Bluetooth keyboard or remote control
 4. For a better experience, add the page to your home screen:
     - Tap the Share button
     - Select "Add to Home Screen"
