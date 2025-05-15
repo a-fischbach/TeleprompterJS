@@ -11,8 +11,8 @@ A simple teleprompter application built with vanilla JavaScript, HTML, and CSS. 
     -   Space or Q: Play/Pause
     -   Up Arrow: Increase Speed
     -   Down Arrow: Decrease Speed
-    -   Y: Scroll Down
-    -   J: Scroll Up
+    -   Y: Hold to Scroll Down (at current speed)
+    -   J: Hold to Scroll Up (at current speed)
 -   Mobile-optimized for iPad usage
 -   Visual marker for current reading position
 

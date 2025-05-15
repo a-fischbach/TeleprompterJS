@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	let scrollSpeed = 1.0;
 	let isPlaying = false;
 	let scrollInterval;
+	let manualScrollInterval;
+	let keysPressed = {};
 
 	// File handling
 	fileInput.addEventListener("change", (event) => {
@@ -59,25 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		stopScrolling(); // Clear any existing interval
 
 		scrollInterval = setInterval(() => {
-			// Get current transform
-			const currentTransform = window.getComputedStyle(textContent).transform;
-			const matrix = new DOMMatrix(currentTransform);
-			const currentY = matrix.m42;
-
-			// Calculate total height of content and container
-			const totalHeight = textContent.offsetHeight;
-			const containerHeight = document.querySelector(".scroll-container").offsetHeight;
-
-			// Stop scrolling if we reach the end
-			if (Math.abs(currentY) >= totalHeight - containerHeight) {
+			// If scrolling fails (hit a boundary), stop auto-scrolling
+			if (!scrollText(-scrollSpeed)) {
 				stopScrolling();
 				isPlaying = false;
 				playPauseButton.textContent = "Play";
-				return;
 			}
-
-			// Move content up by scrollSpeed pixels
-			textContent.style.transform = `translateY(${currentY - scrollSpeed}px)`;
 		}, 16); // ~60fps
 	}
 
@@ -102,20 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (isPlaying) {
 			startScrolling(); // Restart scrolling with new speed
 		}
+
+		if (manualScrollInterval) {
+			clearInterval(manualScrollInterval);
+			startManualScroll(); // Restart manual scrolling with new speed
+		}
 	}
 
-	// Manual scroll functions
-	function scrollUp(amount = 30) {
-		// Get current transform
-		const currentTransform = window.getComputedStyle(textContent).transform;
-		const matrix = new DOMMatrix(currentTransform);
-		const currentY = matrix.m42;
-
-		// Move content down (scrolls text up)
-		textContent.style.transform = `translateY(${currentY + amount}px)`;
-	}
-
-	function scrollDown(amount = 30) {
+	// Scroll text function - reused by both auto and manual scrolling
+	function scrollText(amount) {
 		// Get current transform
 		const currentTransform = window.getComputedStyle(textContent).transform;
 		const matrix = new DOMMatrix(currentTransform);
@@ -125,19 +109,45 @@ document.addEventListener("DOMContentLoaded", () => {
 		const totalHeight = textContent.offsetHeight;
 		const containerHeight = document.querySelector(".scroll-container").offsetHeight;
 
-		// Don't scroll past the bottom
-		if (Math.abs(currentY - amount) >= totalHeight - containerHeight) {
-			return;
+		// Check boundaries
+		if (amount < 0 && Math.abs(currentY - Math.abs(amount)) >= totalHeight - containerHeight) {
+			// Don't scroll past the bottom
+			return false;
+		} else if (amount > 0 && currentY + amount > 0) {
+			// Don't scroll past the top
+			return false;
 		}
 
-		// Move content up (scrolls text down)
-		textContent.style.transform = `translateY(${currentY - amount}px)`;
+		// Move content
+		textContent.style.transform = `translateY(${currentY + amount}px)`;
+		return true;
+	}
+
+	// Manual scroll functions with key hold support
+	function startManualScroll() {
+		clearInterval(manualScrollInterval);
+
+		manualScrollInterval = setInterval(() => {
+			if (keysPressed["y"] || keysPressed["Y"]) {
+				scrollText(-scrollSpeed);
+			} else if (keysPressed["j"] || keysPressed["J"]) {
+				scrollText(scrollSpeed);
+			}
+		}, 16); // ~60fps
+	}
+
+	function stopManualScroll() {
+		clearInterval(manualScrollInterval);
+		manualScrollInterval = null;
 	}
 
 	// Keyboard controls
 	document.addEventListener("keydown", (event) => {
 		// Handle key presses only if text content is loaded
 		if (textContent.innerHTML.trim() === "") return;
+
+		// Track pressed keys
+		keysPressed[event.key] = true;
 
 		switch (event.key) {
 			case " ": // Space bar
@@ -155,18 +165,38 @@ document.addEventListener("DOMContentLoaded", () => {
 			case "y":
 			case "Y":
 				event.preventDefault();
-				scrollDown();
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
 				break;
 			case "j":
 			case "J":
 				event.preventDefault();
-				scrollUp();
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
 				break;
 			case "q":
 			case "Q":
 				event.preventDefault();
 				togglePlayPause();
 				break;
+		}
+	});
+
+	document.addEventListener("keyup", (event) => {
+		// Remove key from pressed keys
+		delete keysPressed[event.key];
+
+		// If both Y and J are released, stop manual scrolling
+		if (
+			(event.key === "y" || event.key === "Y" || event.key === "j" || event.key === "J") &&
+			!keysPressed["y"] &&
+			!keysPressed["Y"] &&
+			!keysPressed["j"] &&
+			!keysPressed["J"]
+		) {
+			stopManualScroll();
 		}
 	});
 
