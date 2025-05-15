@@ -254,5 +254,102 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	// Handle remote key mappings
-	// ... existing code ...
+	function handleRemoteKey(key: string, isKeyDown: boolean): void {
+		// Find which physical key this belongs to
+		for (const [physicalKey, binding] of Object.entries(remoteKeys)) {
+			if (binding.down === key) {
+				keysPressed[physicalKey] = isKeyDown;
+				handleKeyAction(physicalKey, isKeyDown);
+				return;
+			}
+			if (binding.up === key) {
+				keysPressed[physicalKey] = false;
+				handleKeyAction(physicalKey, false);
+				return;
+			}
+		}
+	}
+
+	// Handle actions based on physical keys
+	function handleKeyAction(physicalKey: string, isKeyDown: boolean) {
+		if (!isKeyDown) {
+			// Check if any scroll keys are still pressed
+			const scrollKeysPressed = ["arrowRight", "arrowLeft"].some((key) => keysPressed[key]);
+
+			// If no scroll keys are pressed, stop manual scrolling
+			if (!scrollKeysPressed) {
+				stopManualScroll();
+			}
+			return;
+		}
+
+		// Handle key down actions
+		switch (physicalKey) {
+			case "x": // Y button (scroll down)
+				adjustSpeed(0.1);
+				break;
+			case "y": // U button (scroll down)
+				adjustFontSize(2); // Increase font size by 2px
+				break;
+			case "a": // H button (scroll up)
+				adjustFontSize(-2); // Decrease font size by 2px
+				break;
+			case "b": // J button (scroll up)
+				adjustSpeed(-0.1);
+				break;
+			case "arrowLeft": // W button (scroll left)
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
+				break;
+			case "arrowRight": // X button (scroll right)
+				if (!manualScrollInterval) {
+					startManualScroll();
+				}
+				break;
+			case "arrowDown": // A button (increase speed)
+				togglePlayPause();
+				break;
+			case "arrowUp": // D button (decrease speed)
+				togglePlayPause();
+				break;
+			case "mirror": // O button (play/pause)
+				toggleMirror();
+				break;
+		}
+	}
+
+	// Keyboard controls
+	document.addEventListener("keydown", (event: KeyboardEvent) => {
+		// Handle key presses only if text content is loaded
+		if (textContent.innerHTML.trim() === "") return;
+
+		// Try to handle as a remote key
+		handleRemoteKey(event.key, true);
+		if (Object.values(remoteKeys).some((binding) => binding.down === event.key || binding.up === event.key)) {
+			event.preventDefault();
+			return;
+		}
+
+		// Fall back to regular keyboard controls
+		switch (event.key) {
+			case " ": // Space bar
+				event.preventDefault();
+				togglePlayPause();
+				break;
+		}
+	});
+
+	document.addEventListener("keyup", (event: KeyboardEvent) => {
+		// Try to handle as a remote key
+		handleRemoteKey(event.key, false);
+		if (Object.values(remoteKeys).some((binding) => binding.down === event.key || binding.up === event.key)) {
+			event.preventDefault();
+			return;
+		}
+	});
+
+	// Initialize with controls disabled until file is loaded
+	playPauseButton.setAttribute("disabled", "true");
+	mirrorButton.setAttribute("disabled", "true");
 });
