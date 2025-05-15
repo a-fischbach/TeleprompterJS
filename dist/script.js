@@ -158,14 +158,16 @@ document.addEventListener("DOMContentLoaded", () => {
         // Calculate total height of content and container
         const totalHeight = textContent.offsetHeight;
         const containerHeight = scrollContainer.offsetHeight;
+        const { maxScroll, centerOffset } = calculateCenterOffset();
         // For mirrored text, we need to invert the scroll direction
         const adjustedAmount = isMirrored ? -amount : amount;
-        // Check boundaries
-        if (adjustedAmount < 0 && Math.abs(currentY - Math.abs(adjustedAmount)) >= totalHeight - containerHeight) {
+        // Check boundaries with proper center offset consideration
+        if (adjustedAmount < 0 &&
+            Math.abs(currentY - Math.abs(adjustedAmount)) >= totalHeight - containerHeight + centerOffset) {
             // Don't scroll past the bottom
             return false;
         }
-        else if (adjustedAmount > 0 && currentY + adjustedAmount > 0) {
+        else if (adjustedAmount > 0 && currentY + adjustedAmount > centerOffset) {
             // Don't scroll past the top
             return false;
         }
