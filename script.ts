@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	const speedUpButton = document.getElementById("speed-up") as HTMLButtonElement;
 	const speedDownButton = document.getElementById("speed-down") as HTMLButtonElement;
 	const speedDisplay = document.getElementById("speed-display") as HTMLElement;
+	const fontSizeDisplay = document.getElementById("font-size-display") as HTMLElement;
+	const fontSizeUpButton = document.getElementById("font-size-up") as HTMLButtonElement;
+	const fontSizeDownButton = document.getElementById("font-size-down") as HTMLButtonElement;
 	const scrollContainer = document.querySelector(".scroll-container") as HTMLElement;
 
 	if (
@@ -23,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		!speedUpButton ||
 		!speedDownButton ||
 		!speedDisplay ||
+		!fontSizeDisplay ||
+		!fontSizeUpButton ||
+		!fontSizeDownButton ||
 		!scrollContainer
 	) {
 		console.error("Required DOM elements not found");
@@ -34,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let scrollInterval: number | undefined;
 	let manualScrollInterval: number | undefined;
 	let keysPressed: { [key: string]: boolean } = {};
+	let fontSize = 24; // Default font size in pixels
 
 	interface KeyBindings {
 		[key: string]: {
@@ -128,6 +135,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		adjustSpeed(-0.1);
 	});
 
+	// Font size controls
+	fontSizeUpButton.addEventListener("click", () => {
+		adjustFontSize(2);
+	});
+
+	fontSizeDownButton.addEventListener("click", () => {
+		adjustFontSize(-2);
+	});
+
 	function adjustSpeed(delta: number) {
 		scrollSpeed = Math.max(0.1, Math.min(5.0, scrollSpeed + delta));
 		scrollSpeed = parseFloat(scrollSpeed.toFixed(1)); // Round to 1 decimal place
@@ -141,6 +157,12 @@ document.addEventListener("DOMContentLoaded", () => {
 			clearInterval(manualScrollInterval);
 			startManualScroll(); // Restart manual scrolling with new speed
 		}
+	}
+
+	function adjustFontSize(delta: number) {
+		fontSize = Math.max(12, Math.min(72, fontSize + delta)); // Limit font size between 12px and 72px
+		textContent.style.fontSize = `${fontSize}px`;
+		fontSizeDisplay.textContent = `${fontSize}px`;
 	}
 
 	// Scroll text function - reused by both auto and manual scrolling
@@ -225,10 +247,10 @@ document.addEventListener("DOMContentLoaded", () => {
 				adjustSpeed(0.1);
 				break;
 			case "y": // U button (scroll down)
-				//increase font size
+				adjustFontSize(2); // Increase font size by 2px
 				break;
 			case "a": // H button (scroll up)
-				//decrease font size
+				adjustFontSize(-2); // Decrease font size by 2px
 				break;
 			case "b": // J button (scroll up)
 				adjustSpeed(-0.1);

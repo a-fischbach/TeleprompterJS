@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const speedUpButton = document.getElementById("speed-up");
     const speedDownButton = document.getElementById("speed-down");
     const speedDisplay = document.getElementById("speed-display");
+    const fontSizeDisplay = document.getElementById("font-size-display");
+    const fontSizeUpButton = document.getElementById("font-size-up");
+    const fontSizeDownButton = document.getElementById("font-size-down");
     const scrollContainer = document.querySelector(".scroll-container");
     if (!fileInput ||
         !textContent ||
@@ -13,6 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
         !speedUpButton ||
         !speedDownButton ||
         !speedDisplay ||
+        !fontSizeDisplay ||
+        !fontSizeUpButton ||
+        !fontSizeDownButton ||
         !scrollContainer) {
         console.error("Required DOM elements not found");
         return;
@@ -22,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let scrollInterval;
     let manualScrollInterval;
     let keysPressed = {};
+    let fontSize = 24; // Default font size in pixels
     // Remote key mappings
     const remoteKeys = {
         // Physical key = [keyDown, keyUp]
@@ -97,6 +104,13 @@ document.addEventListener("DOMContentLoaded", () => {
     speedDownButton.addEventListener("click", () => {
         adjustSpeed(-0.1);
     });
+    // Font size controls
+    fontSizeUpButton.addEventListener("click", () => {
+        adjustFontSize(2);
+    });
+    fontSizeDownButton.addEventListener("click", () => {
+        adjustFontSize(-2);
+    });
     function adjustSpeed(delta) {
         scrollSpeed = Math.max(0.1, Math.min(5.0, scrollSpeed + delta));
         scrollSpeed = parseFloat(scrollSpeed.toFixed(1)); // Round to 1 decimal place
@@ -108,6 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(manualScrollInterval);
             startManualScroll(); // Restart manual scrolling with new speed
         }
+    }
+    function adjustFontSize(delta) {
+        fontSize = Math.max(12, Math.min(72, fontSize + delta)); // Limit font size between 12px and 72px
+        textContent.style.fontSize = `${fontSize}px`;
+        fontSizeDisplay.textContent = `${fontSize}px`;
     }
     // Scroll text function - reused by both auto and manual scrolling
     function scrollText(amount) {
@@ -168,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // Handle actions based on physical keys
     function handleKeyAction(physicalKey, isKeyDown) {
-        console.log("key", physicalKey, "isKeyDown", isKeyDown);
         if (!isKeyDown) {
             // Check if any scroll keys are still pressed
             const scrollKeysPressed = ["arrowRight", "arrowLeft"].some((key) => keysPressed[key]);
@@ -184,10 +202,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 adjustSpeed(0.1);
                 break;
             case "y": // U button (scroll down)
-                //increase font size
+                adjustFontSize(2); // Increase font size by 2px
                 break;
             case "a": // H button (scroll up)
-                //decrease font size
+                adjustFontSize(-2); // Decrease font size by 2px
                 break;
             case "b": // J button (scroll up)
                 adjustSpeed(-0.1);
