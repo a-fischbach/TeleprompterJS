@@ -1,0 +1,19 @@
+TELEPROMPTER SAMPLE TEXT
+
+This is a sample text file to demonstrate the teleprompter functionality. You can load your own .txt files to use with this application.
+
+The text will automatically scroll at the speed you set. You can control the teleprompter using either the on-screen buttons or a connected Bluetooth keyboard.
+
+Use the space bar to play or pause the scrolling.
+
+Use the up and down arrow keys to adjust the scrolling speed.
+
+This teleprompter is designed to work well on older iPad models while still providing the core functionality needed for presentations, speeches, or video recordings.
+
+The red line in the middle of the screen indicates the current reading position. Try to keep your eyes focused on this line for the most natural reading pace.
+
+You can format your text files with empty lines between paragraphs for better readability.
+
+For best results, load text files that are not too large and close other applications to ensure smooth performance.
+
+Thank you for using this teleprompter application! 

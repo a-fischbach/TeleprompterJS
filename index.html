@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>Teleprompter</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="controls">
+				<label for="file-input" class="file-label">Open Text File</label>
+				<input type="file" id="file-input" accept=".txt" />
+				<div class="speed-controls">
+					<button id="speed-down">-</button>
+					<span id="speed-display">1.0x</span>
+					<button id="speed-up">+</button>
+				</div>
+				<button id="play-pause">Play</button>
+			</div>
+			<div class="teleprompter">
+				<div class="scroll-container">
+					<div id="text-content"></div>
+				</div>
+				<div class="center-marker"></div>
+			</div>
+		</div>
+		<div class="keyboard-instructions">
+			<p>Keyboard Controls:</p>
+			<ul>
+				<li>Space or Q: Play/Pause</li>
+				<li>Up Arrow: Increase Speed</li>
+				<li>Down Arrow: Decrease Speed</li>
+				<li>Y: Scroll Down</li>
+				<li>J: Scroll Up</li>
+			</ul>
+		</div>
+		<script src="script.js"></script>
+	</body>
+</html>

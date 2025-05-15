@@ -1,0 +1,139 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background-color: #222;
+	color: white;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	padding: 10px;
+}
+
+.controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px;
+	background-color: #333;
+	border-radius: 5px;
+	margin-bottom: 10px;
+}
+
+.file-label {
+	background-color: #4caf50;
+	color: white;
+	padding: 8px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+#file-input {
+	display: none;
+}
+
+.speed-controls {
+	display: flex;
+	align-items: center;
+}
+
+.speed-controls button {
+	width: 30px;
+	height: 30px;
+	font-size: 18px;
+	background-color: #555;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	margin: 0 5px;
+}
+
+#speed-display {
+	width: 50px;
+	text-align: center;
+}
+
+#play-pause {
+	padding: 8px 12px;
+	background-color: #2196f3;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.teleprompter {
+	flex: 1;
+	position: relative;
+	background-color: black;
+	border-radius: 5px;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+
+.scroll-container {
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+}
+
+#text-content {
+	padding: 20px;
+	font-size: 28px;
+	line-height: 1.5;
+	text-align: center;
+	color: #fff;
+	transform: translateY(0);
+}
+
+.center-marker {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	height: 2px;
+	background-color: rgba(255, 0, 0, 0.5);
+	pointer-events: none;
+}
+
+.keyboard-instructions {
+	background-color: #333;
+	padding: 10px;
+	border-radius: 5px;
+}
+
+.keyboard-instructions ul {
+	list-style-type: none;
+	margin: 10px 0 0 20px;
+}
+
+.keyboard-instructions li {
+	margin-bottom: 5px;
+}
+
+/* iPad Optimizations */
+@media (max-width: 1024px) {
+	.controls {
+		flex-wrap: wrap;
+	}
+
+	#text-content {
+		font-size: 32px;
+	}
+}
+
+@media (max-width: 768px) {
+	#text-content {
+		font-size: 24px;
+	}
+}
