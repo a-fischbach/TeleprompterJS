@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Move content with mirroring if enabled
 		textContent.style.transform = isMirrored
-			? `translateY(${currentY + amount}px) scaleX(-1)`
+			? `translateY(${currentY + amount}px) scaleX(-1) scaleY(-1)`
 			: `translateY(${currentY + amount}px)`;
 		return true;
 	}
@@ -230,7 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		const currentY = matrix.m42;
 
 		// Apply transform with mirroring to text content
-		textContent.style.transform = isMirrored ? `translateY(${currentY}px) scaleX(-1)` : `translateY(${currentY}px)`;
+		textContent.style.transform = isMirrored
+			? `translateY(${currentY}px) scaleX(-1) scaleY(-1)`
+			: `translateY(${currentY}px)`;
 
 		// Mirror all UI elements
 		const uiElements = [
@@ -252,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		uiElements.forEach((element) => {
 			if (element) {
-				(element as HTMLElement).style.transform = isMirrored ? "scaleX(-1)" : "";
+				(element as HTMLElement).style.transform = isMirrored ? "scaleX(-1) scaleY(-1)" : "";
 			}
 		});
 	}
