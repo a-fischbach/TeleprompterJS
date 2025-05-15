@@ -1,4 +1,9 @@
 "use strict";
+// Constants for localStorage keys
+const STORAGE_KEYS = {
+    SCROLL_SPEED: "teleprompter_scroll_speed",
+    FONT_SIZE: "teleprompter_font_size",
+};
 document.addEventListener("DOMContentLoaded", () => {
     const fileInput = document.getElementById("file-input");
     const fileInputLabel = document.getElementById("file-input-label");
@@ -27,13 +32,29 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Required DOM elements not found");
         return;
     }
-    let scrollSpeed = 1.0;
+    let scrollSpeed = loadScrollSpeed();
     let isPlaying = false;
     let isMirrored = false;
     let scrollInterval;
     let manualScrollInterval;
     let keysPressed = {};
-    let fontSize = 24; // Default font size in pixels
+    let fontSize = loadFontSize();
+    // Load preferences from localStorage
+    function loadScrollSpeed() {
+        const saved = localStorage.getItem(STORAGE_KEYS.SCROLL_SPEED);
+        return saved ? parseFloat(saved) : 1.0;
+    }
+    function loadFontSize() {
+        const saved = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
+        return saved ? parseInt(saved) : 24;
+    }
+    // Save preferences to localStorage
+    function saveScrollSpeed(speed) {
+        localStorage.setItem(STORAGE_KEYS.SCROLL_SPEED, speed.toString());
+    }
+    function saveFontSize(size) {
+        localStorage.setItem(STORAGE_KEYS.FONT_SIZE, size.toString());
+    }
     // Remote key mappings
     const remoteKeys = {
         // Physical key = [keyDown, keyUp]
@@ -130,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollSpeed = Math.max(0.1, Math.min(5.0, scrollSpeed + delta));
         scrollSpeed = parseFloat(scrollSpeed.toFixed(1)); // Round to 1 decimal place
         speedDisplay.textContent = `${scrollSpeed.toFixed(1)}x`;
+        saveScrollSpeed(scrollSpeed); // Save to localStorage
         if (isPlaying) {
             startScrolling(); // Restart scrolling with new speed
         }
@@ -142,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fontSize = Math.max(12, Math.min(72, fontSize + delta)); // Limit font size between 12px and 72px
         textContent.style.fontSize = `${fontSize}px`;
         fontSizeDisplay.textContent = `${fontSize}px`;
+        saveFontSize(fontSize); // Save to localStorage
         // Recalculate center offset after font size change
         const { maxScroll, centerOffset } = calculateCenterOffset();
         // Apply the new center offset while preserving any existing mirroring
