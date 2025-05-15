@@ -239,11 +239,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			? `translateY(${-maxScroll}px) scaleX(-1) rotate(180deg)`
 			: `translateY(0)`;
 
-		fileInputLabel.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
-		mirrorButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
-		playPauseButton.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
-		fontSizeDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
-		speedDisplay.style.transform = isMirrored ? `scaleX(-1)` : `scaleX(1) rotate(180deg)`;
+		fileInputLabel.style.transform = isMirrored ? `scaleX(-1) rotate(180deg)` : `scaleX(1)`;
+		mirrorButton.style.transform = isMirrored ? `scaleX(-1) rotate(180deg)` : `scaleX(1)`;
+		playPauseButton.style.transform = isMirrored ? `scaleX(-1) rotate(180deg)` : `scaleX(1)`;
+		fontSizeDisplay.style.transform = isMirrored ? `scaleX(-1) rotate(180deg)` : `scaleX(1)`;
+		speedDisplay.style.transform = isMirrored ? `scaleX(-1) rotate(180deg)` : `scaleX(1)`;
 	}
 
 	// Handle remote key mappings
