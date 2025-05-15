@@ -9,19 +9,24 @@
 	<body>
 		<div class="container">
 			<div class="controls">
-				<label for="file-input" class="file-label">Open Text File</label>
-				<input type="file" id="file-input" accept=".txt" />
-				<div class="speed-controls">
-					<button id="speed-down">-</button>
-					<span id="speed-display">1.0x</span>
-					<button id="speed-up">+</button>
-				</div>
-				<div class="font-size-controls">
-					<button id="font-size-down">-</button>
-					<span id="font-size-display">24px</span>
-					<button id="font-size-up">+</button>
+				<div class="left-controls">
+					<label for="file-input" class="file-label">Open Text File</label>
+					<input type="file" id="file-input" accept=".txt" />
+					<div class="speed-controls">
+						<button id="speed-down">-</button>
+						<span id="speed-display">1.0x</span>
+						<button id="speed-up">+</button>
+					</div>
 				</div>
 				<button id="play-pause">Play</button>
+				<div class="right-controls">
+					<div class="font-size-controls">
+						<button id="font-size-down">-</button>
+						<span id="font-size-display">24px</span>
+						<button id="font-size-up">+</button>
+					</div>
+					<button id="mirror">Mirror</button>
+				</div>
 			</div>
 			<div class="teleprompter">
 				<div class="scroll-container">
@@ -48,6 +53,7 @@
 				<li>Down Arrow: Decrease Speed</li>
 				<li>Y: Increase Font Size</li>
 				<li>A: Decrease Font Size</li>
+				<li>O: Toggle Mirror</li>
 			</ul>
 		</div>
 		<script src="dist/script.js"></script>

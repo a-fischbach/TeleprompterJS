@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const fontSizeUpButton = document.getElementById("font-size-up") as HTMLButtonElement;
 	const fontSizeDownButton = document.getElementById("font-size-down") as HTMLButtonElement;
 	const scrollContainer = document.querySelector(".scroll-container") as HTMLElement;
+	const mirrorButton = document.getElementById("mirror") as HTMLButtonElement;
 
 	if (
 		!fileInput ||
@@ -29,7 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		!fontSizeDisplay ||
 		!fontSizeUpButton ||
 		!fontSizeDownButton ||
-		!scrollContainer
+		!scrollContainer ||
+		!mirrorButton
 	) {
 		console.error("Required DOM elements not found");
 		return;
@@ -37,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let scrollSpeed = 1.0;
 	let isPlaying = false;
+	let isMirrored = false;
 	let scrollInterval: number | undefined;
 	let manualScrollInterval: number | undefined;
 	let keysPressed: { [key: string]: boolean } = {};
@@ -93,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Enable controls
 		playPauseButton.removeAttribute("disabled");
+		mirrorButton.removeAttribute("disabled");
 	}
 
 	// Play/Pause functionality
@@ -185,8 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			return false;
 		}
 
-		// Move content
-		textContent.style.transform = `translateY(${currentY + amount}px)`;
+		// Move content with mirroring if enabled
+		textContent.style.transform = isMirrored
+			? `translateY(${currentY + amount}px) scaleX(-1)`
+			: `translateY(${currentY + amount}px)`;
 		return true;
 	}
 
@@ -209,6 +215,22 @@ document.addEventListener("DOMContentLoaded", () => {
 	function stopManualScroll() {
 		clearInterval(manualScrollInterval);
 		manualScrollInterval = undefined;
+	}
+
+	// Mirror functionality
+	mirrorButton.addEventListener("click", toggleMirror);
+
+	function toggleMirror() {
+		isMirrored = !isMirrored;
+		mirrorButton.textContent = isMirrored ? "Unmirror" : "Mirror";
+
+		// Get current Y position
+		const currentTransform = window.getComputedStyle(textContent).transform;
+		const matrix = new DOMMatrix(currentTransform);
+		const currentY = matrix.m42;
+
+		// Apply transform with mirroring
+		textContent.style.transform = isMirrored ? `translateY(${currentY}px) scaleX(-1)` : `translateY(${currentY}px)`;
 	}
 
 	// Handle remote key mappings
@@ -272,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				togglePlayPause();
 				break;
 			case "mirror": // O button (play/pause)
-				//mirror the text
+				toggleMirror();
 				break;
 		}
 	}
@@ -307,10 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	scrollContainer.addEventListener("click", (event: Event) => {
-		console.log("scroll", event);
-	});
-
 	// Initialize with controls disabled until file is loaded
 	playPauseButton.setAttribute("disabled", "true");
+	mirrorButton.setAttribute("disabled", "true");
 });

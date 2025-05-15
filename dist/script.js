@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fontSizeUpButton = document.getElementById("font-size-up");
     const fontSizeDownButton = document.getElementById("font-size-down");
     const scrollContainer = document.querySelector(".scroll-container");
+    const mirrorButton = document.getElementById("mirror");
     if (!fileInput ||
         !textContent ||
         !playPauseButton ||
@@ -19,12 +20,14 @@ document.addEventListener("DOMContentLoaded", () => {
         !fontSizeDisplay ||
         !fontSizeUpButton ||
         !fontSizeDownButton ||
-        !scrollContainer) {
+        !scrollContainer ||
+        !mirrorButton) {
         console.error("Required DOM elements not found");
         return;
     }
     let scrollSpeed = 1.0;
     let isPlaying = false;
+    let isMirrored = false;
     let scrollInterval;
     let manualScrollInterval;
     let keysPressed = {};
@@ -70,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         textContent.style.transform = "translateY(0)";
         // Enable controls
         playPauseButton.removeAttribute("disabled");
+        mirrorButton.removeAttribute("disabled");
     }
     // Play/Pause functionality
     playPauseButton.addEventListener("click", togglePlayPause);
@@ -146,8 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // Don't scroll past the top
             return false;
         }
-        // Move content
-        textContent.style.transform = `translateY(${currentY + amount}px)`;
+        // Move content with mirroring if enabled
+        textContent.style.transform = isMirrored
+            ? `translateY(${currentY + amount}px) scaleX(-1)`
+            : `translateY(${currentY + amount}px)`;
         return true;
     }
     // Manual scroll functions with key hold support
@@ -168,6 +174,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function stopManualScroll() {
         clearInterval(manualScrollInterval);
         manualScrollInterval = undefined;
+    }
+    // Mirror functionality
+    mirrorButton.addEventListener("click", toggleMirror);
+    function toggleMirror() {
+        isMirrored = !isMirrored;
+        mirrorButton.textContent = isMirrored ? "Unmirror" : "Mirror";
+        // Get current Y position
+        const currentTransform = window.getComputedStyle(textContent).transform;
+        const matrix = new DOMMatrix(currentTransform);
+        const currentY = matrix.m42;
+        // Apply transform with mirroring
+        textContent.style.transform = isMirrored ? `translateY(${currentY}px) scaleX(-1)` : `translateY(${currentY}px)`;
     }
     // Handle remote key mappings
     function handleRemoteKey(key, isKeyDown) {
@@ -227,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 togglePlayPause();
                 break;
             case "mirror": // O button (play/pause)
-                //mirror the text
+                toggleMirror();
                 break;
         }
     }
@@ -258,9 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
     });
-    scrollContainer.addEventListener("click", (event) => {
-        console.log("scroll", event);
-    });
     // Initialize with controls disabled until file is loaded
     playPauseButton.setAttribute("disabled", "true");
+    mirrorButton.setAttribute("disabled", "true");
 });
