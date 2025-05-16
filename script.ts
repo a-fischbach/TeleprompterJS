@@ -392,6 +392,34 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	// Mouse wheel scrolling
+	scrollContainer.addEventListener("wheel", (event: WheelEvent) => {
+		event.preventDefault();
+		// Adjust scroll speed based on wheel delta
+		const scrollAmount = event.deltaY * 0.5;
+		scrollText(-scrollAmount);
+	});
+
+	// Touch scrolling
+	let touchStartY = 0;
+	let lastTouchY = 0;
+
+	scrollContainer.addEventListener("touchstart", (event: TouchEvent) => {
+		touchStartY = event.touches[0].clientY;
+		lastTouchY = touchStartY;
+	});
+
+	scrollContainer.addEventListener("touchmove", (event: TouchEvent) => {
+		event.preventDefault();
+		const currentY = event.touches[0].clientY;
+		const deltaY = lastTouchY - currentY;
+		lastTouchY = currentY;
+
+		// Adjust scroll speed based on touch movement
+		const scrollAmount = deltaY * 0.5;
+		scrollText(-scrollAmount);
+	});
+
 	// Initialize with controls disabled until file is loaded
 	playPauseButton.setAttribute("disabled", "true");
 	mirrorButton.setAttribute("disabled", "true");
